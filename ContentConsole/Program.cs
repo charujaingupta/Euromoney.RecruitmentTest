@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ContentAPI;
+using System;
 
 namespace ContentConsole
 {
@@ -6,38 +7,84 @@ namespace ContentConsole
     {
         public static void Main(string[] args)
         {
-            string bannedWord1 = "swine";
-            string bannedWord2 = "bad";
-            string bannedWord3 = "nasty";
-            string bannedWord4 = "horrible";
+           
+            Console.WriteLine("Enter number corresponds to your user type:\n1 Admin\n2 User\n3 Reader\n4 ContentCurator");
+            string userType = Console.ReadLine();
+            UserType ut;
+            if (!string.IsNullOrEmpty(userType))
+            {
+                try
+                {
+                    ut = (UserType)Enum.Parse(typeof(UserType), userType);
 
-            string content =
-                "The weather in Manchester in winter is bad. It rains all the time - it must be horrible for people visiting.";
+                    ContentFactory fac = new ContentFactory(ut);
 
-            int badWords = 0;
-            if (content.Contains(bannedWord1))
-            {
-                badWords = badWords + 1;
-            }
-            if (content.Contains(bannedWord2))
-            {
-                badWords = badWords + 1;
-            }
-            if (content.Contains(bannedWord3))
-            {
-                badWords = badWords + 1;
-            }
-            if (content.Contains(bannedWord4))
-            {
-                badWords = badWords + 1;
-            }
+                    if(ut == UserType.Admin)
+                    {
+                        string negWords = string.Empty;
+                        AdminContentService svc = (AdminContentService)fac.GetServiceInstance();
+                        Console.WriteLine("Enter number corresponds to the following action you'd like to do: \n1 Show content\n2 Show negative words\n3 Add negative word\n4 Show negative word\n5 Exit");
+                        string adminAction = string.Empty;
 
-            Console.WriteLine("Scanned the text:");
-            Console.WriteLine(content);
-            Console.WriteLine("Total Number of negative words: " + badWords);
+                        while (adminAction != "5")
+                        {
+                            adminAction = Console.ReadLine();
+                            if (adminAction == "1")
+                            {
+                                Console.WriteLine("Displaying content: ");
+                                Console.WriteLine(svc.GetContent());
+                            }
+                            else if (adminAction == "2")
+                            {
+                                negWords = string.Empty;
+                                Console.WriteLine("Displaying negative words: ");
+                                svc.GetNegativeWords().ForEach(x => negWords += string.Format("{0}\n", x));
+                                Console.WriteLine(negWords);
+                            }
+                            else if (adminAction == "3")
+                            {
+                                Console.WriteLine("Enter a word to add a list of negative words: ");
+                                string badword = Console.ReadLine();
+                                svc.AddNegativeWord(badword);
+                            }
+                            else if (adminAction == "4")
+                            {
+                                Console.WriteLine("Enter a word to remove from the list of negative words: ");
+                                string badword = Console.ReadLine();
+                                svc.RemoveNegativeWord(badword);
+                            }
+                        }
+
+
+                    }
+                    else if(ut == UserType.User)
+                    {
+                        //Similar to above implemention as per rules specific to this user 
+                        //not implemented due to time constraint
+                    }
+                    else if(ut == UserType.Reader)
+                    {
+                        //Similar to above implemention as per rules specific to this user 
+                        //not implemented due to time constraint
+                    }
+                    else if(ut == UserType.ContentCurator)
+                    {
+                        //Similar to above implemention as per rules specific to this user 
+                        //not implemented due to time constraint
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                    Console.WriteLine("Press ANY key to exit.");
+                    Console.ReadKey();
+                }
+            }
 
             Console.WriteLine("Press ANY key to exit.");
             Console.ReadKey();
+            
+
         }
     }
 
